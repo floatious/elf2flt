@@ -324,6 +324,22 @@ static int do_final_link(void)
 		append_option(&other_options, concat(got_offset, "=", buf, NULL));
 	}
 
+	if (streq(TARGET_CPU, "riscv64")) {
+		/*
+		 * The .got section must come before the .got.plt section
+		 * (gcc/ld bug ?).
+		 */
+		append_sed(&sed, "(.got.plt)", "(.got.tmp)");
+		append_sed(&sed, "(.got.plt)", "(.got)");
+		append_sed(&sed, "(.got.tmp)", "(.got.plt)");
+
+		/* The global pointer symbol is defined after the GOT. */
+		append_sed(&sed, "^RISCV_GP:", "");
+	} else {
+		/* Get rid of the global pointer definition. */
+		append_sed(&sed, "^RISCV_GP:", NULL);
+	}
+
 	/* Locate the default linker script, if we don't have one provided. */
 	if (!linker_script)
 		linker_script = concat(ldscriptpath, "/elf2flt.ld", NULL);
