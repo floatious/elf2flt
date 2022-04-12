@@ -819,7 +819,9 @@ output_relocs (
 #elif defined(TARGET_riscv64)
 				case R_RISCV_32_PCREL:
 				case R_RISCV_ADD32:
+				case R_RISCV_ADD64:
 				case R_RISCV_SUB32:
+				case R_RISCV_SUB64:
 					continue;
 				case R_RISCV_32:
 				case R_RISCV_64:
@@ -1845,15 +1847,6 @@ int main(int argc, char *argv[])
    */
   if (!load_to_ram && !pfile)
     load_to_ram = 1;
-
-#if defined(TARGET_riscv64)
-  /*
-   * riscv only supports loading text and data contiguously.
-   * So fail if load_to_ram is false.
-   */
-  if (!load_to_ram)
-    fatal("Loading to RAM ('-r' option) is required");
-#endif
 
   fname = argv[argc-1];
 
